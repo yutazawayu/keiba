@@ -279,7 +279,8 @@ def main():
         elif not df.empty:
 
             st.session_state['df'] = df.copy()  # セッションに保存
-
+            st.write("馬名一覧",df_ai["馬名"].tolist())
+            st.write("馬名欠損数",df_ai["馬名"].isnull().sum())
             # --- 出馬表データの表示は省略（AI予想のみ表示） ---
 
             import os
