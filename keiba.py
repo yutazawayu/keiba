@@ -4,8 +4,7 @@ def fetch_table(url):
 
     try:
 
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"}
-
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:115.0) Gecko/20100101 Firefox/115.0"}
         res = requests.get(url, headers=headers, verify=False, timeout=10)
 
         res.encoding = res.apparent_encoding
@@ -18,7 +17,7 @@ def fetch_table(url):
 
             cols = [td.get_text(strip=True) for td in tr.find_all(["td","th"])]
 
-            if len(cols) > 3:
+            if len(cols) > 1:
 
                 rows.append(cols)
 
@@ -279,8 +278,7 @@ def main():
         elif not df.empty:
 
             st.session_state['df'] = df.copy()  # セッションに保存
-            st.write("馬名一覧",df_ai["馬名"].tolist())
-            st.write("馬名欠損数",df_ai["馬名"].isnull().sum())
+
             # --- 出馬表データの表示は省略（AI予想のみ表示） ---
 
             import os
@@ -1057,9 +1055,11 @@ def main():
 
                     df_ai.at[idx, "AI印"] = mark
 
-                # シンプルなテーブルのみ表示
+                # シンプルなテーブルのみ表示（馬番のみ表示）
 
-                pred_df = df_ai[["馬名", "AI印", "AI_1着確率"]].copy() if "馬名" in df_ai.columns else df_ai[["AI印", "AI_1着確率"]].copy()
+                df_ai["馬番"] = df_ai.index.map(lambda x: f"馬番{x+1}")
+
+                pred_df = df_ai[["馬番", "AI印", "AI_1着確率"]].copy()
 
                 pred_df = pred_df.sort_values("AI_1着確率", ascending=False).reset_index(drop=True)
 
